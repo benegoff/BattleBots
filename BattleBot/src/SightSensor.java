@@ -1,10 +1,4 @@
-package app.sensors;
 
-import app.events.Event;
-import app.events.SightSensorEvent;
-import app.interfaces.EventListener;
-import app.interfaces.SightSensorListener;
-import app.tests.ISightSensor;
 import lejos.nxt.UltrasonicSensor;
 
 /**

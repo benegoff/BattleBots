@@ -1,11 +1,7 @@
-package app.sensors;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import app.events.Event;
-import app.interfaces.EventListener;
-import app.interfaces.Sensor;
 import lejos.nxt.SensorPort;
 
 public abstract class AbstractSensor implements Sensor, Runnable {

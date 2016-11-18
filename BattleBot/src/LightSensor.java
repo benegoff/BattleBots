@@ -1,9 +1,4 @@
-package app.sensors;
 
-import app.events.Event;
-import app.events.LightSensorEvent;
-import app.interfaces.EventListener;
-import app.interfaces.LightSensorListener;
 import lejos.nxt.SensorPort;
 
 /**

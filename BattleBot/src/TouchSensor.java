@@ -1,10 +1,4 @@
-package app.sensors;
 
-import app.events.Event;
-import app.events.TouchSensorEvent;
-import app.interfaces.EventListener;
-import app.interfaces.TouchSensorListener;
-import app.tests.ITouchSensor;
 
 /**
  * Lowest level code above the hardware of the touch sensor.
