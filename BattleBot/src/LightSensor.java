@@ -6,11 +6,11 @@ import lejos.nxt.SensorPort;
  */
 public class LightSensor extends AbstractSensor {
 	
-	private lejos.nxt.LightSensor sensorWrapper;
+	private ILightSensor sensorWrapper;
 	/**
 	 * Constructs a new LightSensor object.
 	 */
-	public LightSensor(lejos.nxt.LightSensor sensor) {
+	public LightSensor(ILightSensor sensor) {
 		super();
 		sensorWrapper = sensor;
 	}
@@ -24,7 +24,7 @@ public class LightSensor extends AbstractSensor {
 		final int SENSOR_MIN = -1;
 		final int SENSOR_MAX = 100;
 		// Read information from the sensor.
-		int value = sensorWrapper.getLightValue();
+		int value = sensorWrapper.getLightReading();
 		// If the value is valid within the sensor's range
 		if(value > SENSOR_MIN && value < SENSOR_MAX) {
 			// Create an event
