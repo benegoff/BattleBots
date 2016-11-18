@@ -1,6 +1,3 @@
-
-import lejos.nxt.UltrasonicSensor;
-
 /**
  * Lowest level code above the hardware of the sight sensor.
  */

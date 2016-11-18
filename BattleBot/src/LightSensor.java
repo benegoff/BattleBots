@@ -1,6 +1,3 @@
-
-import lejos.nxt.SensorPort;
-
 /**
  * Lowest level code above the hardware of the light sensor.
  */

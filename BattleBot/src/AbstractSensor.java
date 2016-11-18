@@ -2,8 +2,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import lejos.nxt.SensorPort;
-
 public abstract class AbstractSensor implements Sensor, Runnable {
 
 	protected List<EventListener> listeners;
