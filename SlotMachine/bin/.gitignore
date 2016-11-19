@@ -9,3 +9,5 @@
 /LightSensorEvent.class
 /LightSensorListener.class
 /LightSensorWrapper.class
+/CoinSlot.class
+/CoinSlotListener.class

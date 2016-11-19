@@ -1,14 +1,16 @@
 import java.util.Random;
 
+import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 
-public class SlotMachine {
+public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlotListener {
 
 	private Lever slotLever;
+	private ResetButton resetButton;
+	private CoinSlot coinSlot;
 	
 	private CoinWheel coinHolder;
 	private CoinDoor coinDoor;
-	private CoinSlot coinSlot;
 	
 	private boolean gameHasNotBeenPlayed;
 	
@@ -18,12 +20,34 @@ public class SlotMachine {
 	public SlotMachine() {
 		// Set the value of gameHasNotBeenPlayed
 		gameHasNotBeenPlayed = true;
-		// Construct the CoinWheel
-		coinHolder = new CoinWheel();
+		// Construct the components
+		constructComponents();
+		// Register with event providers
+		registerEvents();
+		
+	}
+
+	/**
+	 * Constructs the needed components of the slot machine.
+	 */
+	private void constructComponents() {
 		// Construct the coin Door
-		coinDoor = new CoinDoor();
+		coinDoor = new CoinDoor(Motor.A);
+		// Construct the CoinWheel
+		coinHolder = new CoinWheel(Motor.B);
+		// Construct the coin slot
+		coinSlot = new CoinSlot(SensorPort.S1);
 		// Construct the lever
 		slotLever = new Lever(SensorPort.S2);
+		// Construct the rest button
+		resetButton = new ResetButton(SensorPort.S3);
+	}
+	
+	private void registerEvents() {
+		// Register with the coin slot
+		coinSlot.registerListenr(this);
+		// Register with the lever
+		slotLever.registerListener(this);
 	}
 	
 	/**
@@ -37,25 +61,56 @@ public class SlotMachine {
 		}
 	}
 	
+	/* ===== LISTENERS ===== */
+	
+	/**
+	 * Called when the state of the lever changes.
+	 * @param isPulled - If true, the lever is pulled, otherwise is false
+	 */
+	@Override
+	public void onLeverEvent(boolean isPulled) {
+		// If a coin is in the coin slot
+			// Play the game
+	}
+	
+	/**
+	 * Called when the state of the reset button changes.
+	 * @param isPushed - If true, the reset button is pushed, otherwise is false
+	 */
+	public void onResetButtonEvent(boolean isPushed) {
+		// If a coin is in the coin slot
+			// Dispense a single coin
+	}
+	
+	/* ===== SLOT MACHINE METHODS ===== */
+	
+	/**
+	 * Called when the lever is pulled when a coin is in the coin slot.
+	 * This method plays a single round of the game
+	 */
 	public void playGame() {
 		// Generate a number
+		int num = generateNumber();
 		// If the number is even,
+		if(isNumberEven(num)) {
 			// Play winning song
 			// Dispense all coins
-		// Otherwise,
+		} else { // Otherwise, 
 			// play losing song
 			// Rotate coin wheel
+		}
 	}
 	
-	public void returnCoin() {
-		// Rotate coin wheel
-		// Open coin door
-	}
-	
+	/**
+	 * Dispenses all coins that can be stored in the system.
+	 */
 	private void dispenseAllCoins() {
 		// Dispense all 4 coins in the system.
 	}
 	
+	/**
+	 * Dispenses a single coin from the system.
+	 */
 	private void dispenseCoin() {
 		// Rotate the coin wheel
 		// Open the coin door
