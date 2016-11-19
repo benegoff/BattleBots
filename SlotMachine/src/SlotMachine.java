@@ -9,8 +9,9 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	private ResetButton resetButton;
 	private CoinSlot coinSlot;
 	
-	private CoinWheel coinHolder;
+	private CoinWheel coinWheel;
 	private CoinDoor coinDoor;
+	private SoundMaker soundProducer;
 	
 	private boolean gameHasNotBeenPlayed;
 	
@@ -24,7 +25,6 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 		constructComponents();
 		// Register with event providers
 		registerEvents();
-		
 	}
 
 	/**
@@ -34,13 +34,15 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 		// Construct the coin Door
 		coinDoor = new CoinDoor(Motor.A);
 		// Construct the CoinWheel
-		coinHolder = new CoinWheel(Motor.B);
+		coinWheel = new CoinWheel(Motor.B);
 		// Construct the coin slot
 		coinSlot = new CoinSlot(SensorPort.S1);
 		// Construct the lever
 		slotLever = new Lever(SensorPort.S2);
 		// Construct the rest button
 		resetButton = new ResetButton(SensorPort.S3);
+		// Create the sound maker
+		soundProducer = new SoundMaker();
 	}
 	
 	private void registerEvents() {
@@ -48,6 +50,8 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 		coinSlot.registerListenr(this);
 		// Register with the lever
 		slotLever.registerListener(this);
+		// Register with the reset button
+		resetButton.registerListener(this);
 	}
 	
 	/**
@@ -77,9 +81,19 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	 * Called when the state of the reset button changes.
 	 * @param isPushed - If true, the reset button is pushed, otherwise is false
 	 */
+	@Override
 	public void onResetButtonEvent(boolean isPushed) {
 		// If a coin is in the coin slot
 			// Dispense a single coin
+	}
+	
+	/**
+	 * Called when the state of the coin slot changes.
+	 * @param isCoinPreset - If true, then a coin is in the slot, otherwise is false
+	 */
+	@Override
+	public void onCoinEvent(boolean isCoinPresent) {
+		
 	}
 	
 	/* ===== SLOT MACHINE METHODS ===== */

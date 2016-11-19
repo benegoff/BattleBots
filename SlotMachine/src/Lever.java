@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 import lejos.nxt.SensorPort;
@@ -17,7 +18,7 @@ public class Lever implements TouchListener{
 		// Set the value of isLeverPulled
 		isLeverPulled = false;
 		// Construct the list of listeners
-		listeners = new ArrayListener<LeverListener>();
+		listeners = new ArrayList<LeverListener>();
 		// Create a TouchDetector for the lever button
 		leverButton = new TouchDetector(new TouchSensorWrapper(p));
 		// Register with the lever button
@@ -49,7 +50,12 @@ public class Lever implements TouchListener{
 	@Override
 	public void onTouchEvent(TouchEvent e) {
 		// If the event is different from the stored state,
+		if(e.getIsPressed() != isLeverPulled) {
+			// Update the value of isLeverPulled
+			isLeverPulled = e.getIsPressed();
 			// Send the event to the listeners
+			notifyListeners(isLeverPulled);
+		}
 	}
 	
 	/**
