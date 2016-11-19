@@ -1,0 +1,14 @@
+/SlotMachine.class
+/Lever.class
+/ResetButton.class
+/SoundMaker.class
+/CoinWheel.class
+/CoinDoor.class
+/ITouchSensor.class
+/ILightSensor.class
+/LeverListener.class
+/ResetButtonListener.class
+/LightSensor.class
+/CoinDetector.class
+/TouchDetector.class
+/TouchSensor.class
