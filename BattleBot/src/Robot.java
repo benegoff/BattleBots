@@ -1,13 +1,21 @@
 import lejos.nxt.MotorPort;
+import lejos.nxt.SensorPort;
 
 
-public class Robot {
+public class Robot implements ActionListener {
 	
 	private Action currentState; 
 	private Drivetrain drivetrain;
+	private RobotDetector detector;
+	private RobotArm arm;
 
 	public Robot() {
 		drivetrain = new Drivetrain(MotorPort.A, MotorPort.B);
+		SightSensor s = new SightSensor(new UltrasonicWrapper(SensorPort.S1));
+		TouchSensor t = new TouchSensor(new TouchWrapper(SensorPort.S3));
+		detector = new RobotDetector(s, t);
+		detector.registerListener(this);
+		arm = new RobotArm(Motor.C);
 	}
 	
 	public void start() {
@@ -62,6 +70,19 @@ public class Robot {
 			
 		}
 	}
+
+	@Override
+	public void onActionEvent(ActionEvent action) {
+		switch(action.getAction()){
+		case MovingForward:
+			drivetrain.moveForward();
+			break;
+		case Flipping:
+			arm.close();
+			break;
+		}
+	}
+	
 	
 	private boolean isWiggling() {
 		return currentState == Action.Wiggle;

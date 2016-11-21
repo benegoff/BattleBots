@@ -1,11 +1,8 @@
-/TouchSensorWrapper.class
 /AbstractSensor.class
-/EventListener.class
+/CoinSlot.class
+/CoinSlotListener.class
 /Event.class
-/TouchListener.class
-/TouchEvent.class
-/CoinEvent.class
-/CoinListener.class
+/EventListener.class
 /LightSensorEvent.class
 /LightSensorListener.class
 /LightSensorWrapper.class
