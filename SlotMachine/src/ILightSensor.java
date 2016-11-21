@@ -1,6 +1,8 @@
 
 public interface ILightSensor {
 
-	public int getLightValue();
-	
+	/**
+	 * Returns the current light sensor value.
+	 */
+	int getLightValue();
 }
