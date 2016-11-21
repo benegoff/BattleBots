@@ -1,0 +1,9 @@
+
+public enum SlotMachineState {
+	NO_COIN,
+	COIN_IN_SLOT,
+	PLAYING_GAME,
+	RETURNING_COIN,
+	ENDING,
+	GAME_OVER
+}

@@ -2,9 +2,12 @@ import java.util.Random;
 
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
+import lejos.util.Delay;
 
 public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlotListener {
 
+	private static final int MAX_COIN_LOAD = 4;
+	
 	private Lever slotLever;
 	private ResetButton resetButton;
 	private CoinSlot coinSlot;
@@ -13,14 +16,14 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	private CoinDoor coinDoor;
 	private SoundMaker soundProducer;
 	
-	private boolean gameHasNotBeenPlayed;
+	private SlotMachineState currentState;
 	
 	/**
 	 * Constructs a new slot machine.
 	 */
 	public SlotMachine() {
-		// Set the value of gameHasNotBeenPlayed
-		gameHasNotBeenPlayed = true;
+		// Set the slot machine's initial state
+		currentState = SlotMachineState.NO_COIN;
 		// Construct the components
 		constructComponents();
 		// Register with event providers
@@ -31,9 +34,9 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	 * Constructs the needed components of the slot machine.
 	 */
 	private void constructComponents() {
-		// Construct the coin Door
+		// Construct the coin door
 		coinDoor = new CoinDoor(Motor.A);
-		// Construct the CoinWheel
+		// Construct the Coin wheel
 		coinWheel = new CoinWheel(Motor.B);
 		// Construct the coin slot
 		coinSlot = new CoinSlot(SensorPort.S1);
@@ -45,6 +48,9 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 		soundProducer = new SoundMaker();
 	}
 	
+	/**
+	 * Registers the SlotMachine with the event providers.
+	 */
 	private void registerEvents() {
 		// Register with the coin slot
 		coinSlot.registerListenr(this);
@@ -55,11 +61,11 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	}
 	
 	/**
-	 * The starting method of the slot machine
+	 * The starting method of the slot machine.
 	 */
 	public void start() {
 		// While the game has not been played...
-		while(gameHasNotBeenPlayed) {
+		while(currentState != SlotMachineState.GAME_OVER) {
 			// Yield the thread
 			Thread.yield();
 		}
@@ -74,7 +80,12 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	@Override
 	public void onLeverEvent(boolean isPulled) {
 		// If a coin is in the coin slot
+		if(currentState == SlotMachineState.COIN_IN_SLOT) {
+			// Change the state of the slot machine to PLAYING_GAME
+			currentState = SlotMachineState.PLAYING_GAME;
 			// Play the game
+			playGame();
+		}
 	}
 	
 	/**
@@ -84,7 +95,14 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	@Override
 	public void onResetButtonEvent(boolean isPushed) {
 		// If a coin is in the coin slot
+		if(currentState == SlotMachineState.COIN_IN_SLOT) {
+			// Change the state of the slot machine to RETURN_COIN
+			currentState = SlotMachineState.RETURNING_COIN;
 			// Dispense a single coin
+			dispenseCoin();
+			// Change the state of the slot machine to NO_COIN
+			currentState = SlotMachineState.NO_COIN;
+		}
 	}
 	
 	/**
@@ -93,7 +111,20 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	 */
 	@Override
 	public void onCoinEvent(boolean isCoinPresent) {
-		
+		// If the slot machine is waiting for a coin,
+		if(currentState == SlotMachineState.NO_COIN) {
+			// If there is now a coin in the slot,
+			if(isCoinPresent) {
+				// Change the state of the slot machine to COIN_IN_SLOT
+				currentState = SlotMachineState.COIN_IN_SLOT;				
+			}
+		} else { // Otherwise there is a coin in the slot already,
+			// If there is no longer a coin in the slot and the game is not over,
+			if(!isCoinPresent && currentState != SlotMachineState.GAME_OVER) {
+				// Change the state of the slot machine to NO_COIN
+				currentState = SlotMachineState.NO_COIN;
+			}
+		}
 	}
 	
 	/* ===== SLOT MACHINE METHODS ===== */
@@ -103,15 +134,37 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	 * This method plays a single round of the game
 	 */
 	public void playGame() {
+		// Get the current time
+		long currentTime = System.currentTimeMillis();
+		long timeTilOver; 
+		
 		// Generate a number
 		int num = generateNumber();
+		// Display the number
+		System.out.println(num);
+		
 		// If the number is even,
 		if(isNumberEven(num)) {
 			// Play winning song
+			timeTilOver = soundProducer.playWinningSound();
 			// Dispense all coins
+			dispenseAllCoins();
 		} else { // Otherwise, 
-			// play losing song
+			// Play losing song
+			timeTilOver = soundProducer.playLosingSound();
 			// Rotate coin wheel
+			coinWheel.rotate();
+		}
+		
+		// Set the current slot machine state to ENDING
+		currentState = SlotMachineState.ENDING;
+		try {
+			// Wait for the song to end
+			Thread.sleep((currentTime + timeTilOver) - System.currentTimeMillis());
+			// Set the current state to GAME_OVER
+			currentState = SlotMachineState.GAME_OVER;
+		} catch(InterruptedException e) {
+			System.out.println("Interrupted!");
 		}
 	}
 	
@@ -119,7 +172,11 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	 * Dispenses all coins that can be stored in the system.
 	 */
 	private void dispenseAllCoins() {
-		// Dispense all 4 coins in the system.
+		// For each coin that the system can hold...
+		for(int i = 0; i < MAX_COIN_LOAD; i++) {
+			// Dispense the coin
+			dispenseCoin();
+		}
 	}
 	
 	/**
@@ -127,9 +184,13 @@ public class SlotMachine implements LeverListener, ResetButtonListener, CoinSlot
 	 */
 	private void dispenseCoin() {
 		// Rotate the coin wheel
+		coinWheel.rotate();
 		// Open the coin door
+		coinDoor.openDoor();
 		// Wait for 1 second
+		Delay.msDelay(1500);
 		// Close the coin door
+		coinDoor.closeDoor();
 	}
 	
 	/**
