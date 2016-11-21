@@ -13,8 +13,6 @@ public class TouchWrapper implements ITouchSensor {
         sensor = new lejos.nxt.TouchSensor(p);
         // Activate the sensor
         p.activate();
-        // Set the sensor mode
-        sensor.continuous();
     }
 
     @Override
