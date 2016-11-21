@@ -10,7 +10,7 @@ public class TouchWrapper implements ITouchSensor {
      * @param p - The SensorPort into which the Ultrasonic sensor is plugged
      */
     public TouchWrapper(SensorPort p) {
-        sensor = new TouchWrapper(p);
+        sensor = new lejos.nxt.TouchSensor(p);
         // Activate the sensor
         p.activate();
         // Set the sensor mode
