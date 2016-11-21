@@ -1,8 +1,6 @@
-
-
 import lejos.nxt.MotorPort;
 
-public class GroundInterface implements SightSensorListener, LineListener {
+public class GroundInterface implements LineListener {
 	
 	private ActionListener listener;
 	private Drivetrain drivetrain;
@@ -12,14 +10,13 @@ public class GroundInterface implements SightSensorListener, LineListener {
 	 * @param lineDetection - The LineDetector with which to register
 	 * @param canDetection - The CanDetector with which to register
 	 */
-	public GroundInterface(LightSensor lineDetection, SightSensor canDetection, ActionListener listener) {
+	public GroundInterface(LineDetector lineDetection, ActionListener listener) {
 		// Create the list of listeners
 		this.listener = listener;
 		// Create the drive train
 		drivetrain = new Drivetrain(MotorPort.A, MotorPort.B);
-		// Register with the line and can detectors
+		// Register with the line detector
 		lineDetection.registerListener(this);
-		canDetection.registerListener(this);
 	}
 	
 	public void unregisterListener() {
@@ -63,30 +60,9 @@ public class GroundInterface implements SightSensorListener, LineListener {
 	 */
 	@Override
 	public void onLineEvent(LineEvent e) {
-		if(listener != null) {
-			if(state == Action.Finished) {
-				listener.onActionEvent(new ActionEvent(Action.Finished));
-			} else {
-				listener.onActionEvent(new ActionEvent(Action.Backup));
-			}
-		}
-
-		// Send ActionEvent to robot declaring its movement
-		// Call to the sound producer to play the backward sound - done by the actionEvent
+		// TODO: Event handling
 	}
-
-	/**
-	 * Implementation of the onSightEvent method from the SightSensorListener interface.
-	 * @param e - The SightSensorEvent that was raised
-	 */
-	@Override
-	public void onSightEvent(SightSensorEvent e) {
-		if(listener != null) {
-			// Call to the sound producer to play the forward sound - action event does this
-			listener.onActionEvent(new ActionEvent(Action.MovingForward));
-		}
-	}
-
+	
 	/**
 	 * Method designed to get the system to leave the bordered area as quickly as possible
 	 */

@@ -1,10 +1,9 @@
-import lejos.nxt.Button;
-import lejos.nxt.Motor;
 import lejos.nxt.MotorPort;
 
 
 public class Robot {
 	
+	private Action currentState; 
 	private Drivetrain drivetrain;
 
 	public Robot() {
@@ -12,35 +11,59 @@ public class Robot {
 	}
 	
 	public void start() {
-		testFrontMotor();
-		wiggle();
+		currentState = Action.Wiggle;
 	}
-	
-	public void testFrontMotor() {
-		System.out.println(Motor.C.getPosition());
-		Motor.C.rotate(60);
-		System.out.println(Motor.C.getPosition());
-		Button.waitForAnyPress();
-		Motor.C.rotate(-60);
-		Button.waitForAnyPress();
-	}
-	
+
 	public void wiggle() {
-		try {
+		halfRotate();
+		while(isWiggling()) {
+			forwardBackward();
+			rotate();
+			forwardBackward();
+			fullRotate();
+		}
+	}
+	
+	private void halfRotate() {
+		if(isWiggling()) {
 			drivetrain.rotate();
-			Thread.sleep(500);
+			sleepForTime(.5f);
+		}
+	}
+
+	private void rotate() {
+		if(isWiggling()) {
+			drivetrain.rotate();
+			sleepForTime(1);
+		}
+	}
+	
+	private void fullRotate() {
+		if(isWiggling()) {
+			drivetrain.rotate();
+			sleepForTime(5);
+		}
+	}
+	
+	private void forwardBackward() {
+		if(isWiggling()) {
 			drivetrain.moveForward();
-			Thread.sleep(500);;
+			sleepForTime(1);
 			drivetrain.moveBackward();
-			Thread.sleep(500);
-			drivetrain.rotateRight();
-			Thread.sleep(1000);
-			drivetrain.moveForward();
-			Thread.sleep(500);;
-			drivetrain.moveBackward();
-			Thread.sleep(500);
+			sleepForTime(1);
+		}
+	}
+	
+	
+	private void sleepForTime(float seconds) {
+		try {
+			Thread.sleep((long)(seconds * 1000.0f));
 		} catch(InterruptedException e) {
 			
 		}
+	}
+	
+	private boolean isWiggling() {
+		return currentState == Action.Wiggle;
 	}
 }

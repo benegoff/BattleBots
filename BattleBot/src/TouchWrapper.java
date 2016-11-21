@@ -1,29 +1,25 @@
 import lejos.nxt.SensorPort;
-import lejos.nxt.UltrasonicSensor;
 
 public class TouchWrapper implements ITouchSensor {
 
     private lejos.nxt.TouchSensor sensor;
 
     /**
-     * Constructs a new UltrasonicWrapper
-     * @param p - The SensorPort into which the Ultrasonic sensor is plugged
+     * Constructs a new TouchWrappers
+     * @param p - The SensorPort into which the Touch sesnor sensor is plugged
      */
     public TouchWrapper(SensorPort p) {
         sensor = new lejos.nxt.TouchSensor(p);
         // Activate the sensor
         p.activate();
-        // Set the sensor mode
-        sensor.continuous();
     }
 
+    /**
+     * Returns the value read in from the sensor.
+     * @return The value read from the hardware sensor
+     */
     @Override
     public boolean isPressed() {
        return sensor.isPressed();
     }
-
-    /**
-     * Returns the distance read from the sensor.
-     * @return The distance read from the sensor
-     */
 }
