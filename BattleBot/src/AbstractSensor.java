@@ -17,7 +17,7 @@ public abstract class AbstractSensor implements Sensor, Runnable {
 		sensorThread = new Thread(this);
 		// Mark the thread as a daemon thread
 		sensorThread.setDaemon(true);
-		// Start hte separate thread
+		// Start the separate thread
 		sensorThread.start();
 	}
 	
@@ -61,11 +61,6 @@ public abstract class AbstractSensor implements Sensor, Runnable {
 	 */
 	protected abstract void detectChange();
 
-	/**
-	 * Creates the event that will be sent to the event listeners.
-	 * @param sensorValue - The value that was read from the sensor
-	 */
-	protected abstract void createEvent(float sensorValue);
 	
 	/**
 	 * Implementation of the callListeners method from the Sensor interface.

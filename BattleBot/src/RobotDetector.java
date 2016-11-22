@@ -1,12 +1,14 @@
+import java.util.ArrayList;
 import java.util.List;
 
-public class RobotDetector implements SightSensorListener, TouchSensorListener{
+public class RobotDetector implements SightSensorListener, TouchListener{
 
 	private SightSensor sightSensor;
 	private TouchSensor touchSensor;
 	private List<ActionListener> actionListeners;
 	
 	public RobotDetector(SightSensor sightSensor, TouchSensor touchSensor){
+		actionListeners = new ArrayList<ActionListener>();
 		this.sightSensor = sightSensor;
 		this.sightSensor.registerListener(this);
 		this.touchSensor = touchSensor;
@@ -23,9 +25,11 @@ public class RobotDetector implements SightSensorListener, TouchSensorListener{
 	}
 	
 	@Override
-	public void onTouchEvent(TouchSensorEvent e) {
-		for(ActionListener al : actionListeners){
-			al.onActionEvent(new ActionEvent(Action.Flipping));
+	public void onTouch(TouchEvent e) {
+		if(e.isTouching()) {
+			for(ActionListener al : actionListeners){
+				al.onActionEvent(new ActionEvent(Action.Flipping));
+			}
 		}
 	}
 

@@ -29,21 +29,9 @@ public class SightSensor extends AbstractSensor {
 		int value = sensorWrapper.getDistance();
 		// If the value read from the sensor is within the sensors valid range,
 		if(value > SENSOR_MIN && value < SENSOR_MAX) {
-			// Create an event
-			createEvent(value);
+			// Send the event
+			notifyListeners(new SightSensorEvent(value));
 		}
-	}
-
-	/**
-	 * Creates an event to be sent to the listeners.
-	 * @param sensorValue - The value that was read in from the sensor
-	 */
-	@Override
-	protected void createEvent(float sensorValue){
-		// Create a SgithSesnorEvent
-		SightSensorEvent sightEvent = new SightSensorEvent((int)sensorValue);
-		// Send the event to the listeners
-		notifyListeners(sightEvent);
 	}
 	
 	/**

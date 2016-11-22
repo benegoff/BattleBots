@@ -1,3 +1,4 @@
+import lejos.nxt.Motor;
 import lejos.nxt.MotorPort;
 import lejos.nxt.SensorPort;
 
@@ -11,15 +12,20 @@ public class Robot implements ActionListener {
 
 	public Robot() {
 		drivetrain = new Drivetrain(MotorPort.A, MotorPort.B);
+		arm = new RobotArm(Motor.C);
 		SightSensor s = new SightSensor(new UltrasonicWrapper(SensorPort.S1));
 		TouchSensor t = new TouchSensor(new TouchWrapper(SensorPort.S3));
 		detector = new RobotDetector(s, t);
 		detector.registerListener(this);
-		arm = new RobotArm(Motor.C);
 	}
 	
 	public void start() {
 		currentState = Action.Wiggle;
+		while(true) {
+			if(currentState == Action.Wiggle) 
+				wiggle();
+			Thread.yield();
+		}
 	}
 
 	public void wiggle() {
@@ -75,12 +81,17 @@ public class Robot implements ActionListener {
 	public void onActionEvent(ActionEvent action) {
 		switch(action.getAction()){
 		case MovingForward:
-			drivetrain.moveForward();
+			changeStateMovingForward();
 			break;
 		case Flipping:
 			arm.close();
 			break;
 		}
+	}
+	
+	private void changeStateMovingForward() {
+		// We don't want to move forward if we are in the following states
+		// Flipping
 	}
 	
 	

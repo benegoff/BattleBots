@@ -1,4 +1,4 @@
-public class TouchEvent {
+public class TouchEvent extends Event {
 
 	private boolean isTouching;
 	

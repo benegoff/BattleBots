@@ -22,24 +22,11 @@ public class TouchSensor extends AbstractSensor {
 	 */
 	@Override
 	protected void detectChange(){
-		// Read in the information from the sensor
-		int value = sensorWrapper.isPressed() ? 1 : 0;
-		// Create an event to send to the listeners
-		createEvent(value);
+		// Read from the sensor
+		boolean pressed = sensorWrapper.isPressed();
+		// Send the event
+		notifyListeners(new TouchEvent(pressed));
 	}
-
-	/**
-	 * Creates an event to send to the event listeners.
-	 * @param sensorValue - The value that was read in from the sensor
-	 */
-	@Override
-	protected void createEvent(float sensorValue){
-		// Create a TouchSensorEvent with the data
-		TouchSensorEvent touchEvent = new TouchSensorEvent((int)sensorValue);
-		// Send the event to the listeners
-		notifyListeners(touchEvent);
-	}
-	
 	/**
 	 * Calls the listening method on the registered listeners.
 	 * @param e - The event that was raised
@@ -49,8 +36,8 @@ public class TouchSensor extends AbstractSensor {
 		// For each listener in the list of registered listeners...
 		for(EventListener l : listeners) {
 			// If the listener is a TouchSensorListener
-			if(l instanceof TouchSensorListener) {
-				((TouchSensorListener) l).onTouchEvent((TouchSensorEvent)e);
+			if(l instanceof TouchListener) {
+				((TouchListener) l).onTouch((TouchEvent)e);
 			}
 		}
 	}

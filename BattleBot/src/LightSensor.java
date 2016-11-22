@@ -24,23 +24,11 @@ public class LightSensor extends AbstractSensor {
 		int value = sensorWrapper.getLightReading();
 		// If the value is valid within the sensor's range
 		if(value > SENSOR_MIN && value < SENSOR_MAX) {
-			// Create an event
-			createEvent(value);
+			// Send the event
+			notifyListeners(new LightSensorEvent(value));
 		}
 	}
 
-	/**
-	 * Implementation of createEvent from AbstractSensor
-	 * @param sensorValue - The value that was read from the sensor
-	 */
-	@Override
-	protected void createEvent(float sensorValue){
-		// Construct a new LightSensorEvent
-		LightSensorEvent lightEvent = new LightSensorEvent((int)sensorValue);
-		// Notify the listeners
-		notifyListeners(lightEvent);
-	}
-	
 	/**
 	 * Notifies all listeners that an event has occurred.
 	 * @param e - The Event that was raised
