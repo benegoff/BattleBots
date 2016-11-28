@@ -4,19 +4,27 @@ public class RobotArm {
 
 	private NXTRegulatedMotor motor;
 	private boolean isClosed;
+	private final int startingDegrees;
+	
 	public RobotArm(NXTRegulatedMotor m){
 		isClosed = false;
+		startingDegrees = m.getPosition();
 		motor = m;
+		motor.setSpeed(720);
 	}
 	
 	public void close(){
-		motor.rotate(60);
-		isClosed = true;
+		if(!isClosed()) {
+			motor.rotateTo(startingDegrees + 90);;
+			isClosed = true;
+		}
 	}
 	
 	public void open(){
-		motor.rotate(-60);
-		isClosed = false;
+		if(isClosed()) {
+			motor.rotateTo(startingDegrees);
+			isClosed = false;
+		}
 	}
 	
 	public boolean isClosed(){

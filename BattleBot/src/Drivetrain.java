@@ -5,11 +5,14 @@ import lejos.nxt.MotorPort;
 
 public class Drivetrain {
 	
-	private static final int POWER = 90;
-	private static final int ROTATE_POWER = 85;
+	public static final int POWER = 90;
+	public static final int ROTATE_POWER = 85;
 	
 	private MotorPort leftWheel;
 	private MotorPort rightWheel;
+	
+	private int currentPower;
+	private int currentRotatePower;
 	
 	/**
 	 * Constructs a new Drivetrain with the given information.
@@ -20,6 +23,36 @@ public class Drivetrain {
 		// Set the values of the left and right wheels
 		leftWheel = left;
 		rightWheel = right;
+		// Set the current power values
+		currentPower = POWER;
+		currentRotatePower = ROTATE_POWER;
+	}
+	
+	/**
+	 * Sets power with which the robot will move forward or backward.
+	 * @param power - The power value in the range 0 - 100, inclusive
+	 */
+	public void setCurrentPower(int power) {
+		currentPower = clampValue(power, 0, 100);
+	}
+	
+	/**
+	 * Sets the value of the current rotation power.
+	 * @param power - The power value in the range 0 - 100, inclusive
+	 */
+	public void setCurrentRotationPower(int power) {
+		currentRotatePower = clampValue(power, 0, 100);
+	}
+	
+	/**
+	 * Clamps a value to within the range.
+	 * @param value - The value to clamp
+	 * @param min - The minimum value
+	 * @param max - The maximum value
+	 * @return The clamped value
+	 */
+	protected int clampValue(int value, int min, int max) {
+		return (value < min) ? min : (value > max) ? max : value;
 	}
 
 	/**
@@ -27,8 +60,8 @@ public class Drivetrain {
 	 */
 	public void moveBackward() {
 		// Set both wheels to rotate forward
-		leftWheel.controlMotor(POWER, BasicMotorPort.FORWARD);
-		rightWheel.controlMotor(POWER, BasicMotorPort.FORWARD);
+		leftWheel.controlMotor(currentPower, BasicMotorPort.FORWARD);
+		rightWheel.controlMotor(currentPower, BasicMotorPort.FORWARD);
 	}
 	
 	/**
@@ -36,25 +69,25 @@ public class Drivetrain {
 	 */
 	public void moveForward() {
 		// Set both wheels to rotate backward
-		leftWheel.controlMotor(POWER, BasicMotorPort.BACKWARD);
-		rightWheel.controlMotor(POWER, BasicMotorPort.BACKWARD);
+		leftWheel.controlMotor(currentPower, BasicMotorPort.BACKWARD);
+		rightWheel.controlMotor(currentPower, BasicMotorPort.BACKWARD);
 	}
 	
 	/**
 	 * Tells the wheels to rotate such that the robot rotates.
 	 */
-	public void rotate() {
+	public void rotateLeft() {
 		// Set the left wheel to rotate forward
-		leftWheel.controlMotor(ROTATE_POWER, BasicMotorPort.FORWARD);
+		leftWheel.controlMotor(currentRotatePower, BasicMotorPort.FORWARD);
 		// Set the right wheel to rotate backward
-		rightWheel.controlMotor(ROTATE_POWER, BasicMotorPort.BACKWARD);
+		rightWheel.controlMotor(currentRotatePower, BasicMotorPort.BACKWARD);
 	}
 	
 	public void rotateRight() {
 		// Set the left wheel to rotate backward
-		leftWheel.controlMotor(ROTATE_POWER, BasicMotorPort.BACKWARD);
+		leftWheel.controlMotor(currentRotatePower, BasicMotorPort.BACKWARD);
 		// Set the right wheel to rotate forward
-		rightWheel.controlMotor(ROTATE_POWER, BasicMotorPort.FORWARD);
+		rightWheel.controlMotor(currentRotatePower, BasicMotorPort.FORWARD);
 	}
 	
 	/**
@@ -62,7 +95,7 @@ public class Drivetrain {
 	 */
 	public void stopMovement() {
 		// Set both wheels to stop moving
-		leftWheel.controlMotor(POWER, BasicMotorPort.STOP);
-		rightWheel.controlMotor(POWER, BasicMotorPort.STOP);
+		leftWheel.controlMotor(currentPower, BasicMotorPort.STOP);
+		rightWheel.controlMotor(currentPower, BasicMotorPort.STOP);
 	}
 }

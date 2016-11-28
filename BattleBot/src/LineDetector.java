@@ -46,11 +46,11 @@ public class LineDetector implements LightSensorListener {
      */
     @Override
     public void onLightSensorEvent(LightSensorEvent e) {
-        final int LINE_THRESHOLD = 40; //47
+        final int LINE_THRESHOLD = 45; //47
         // Determine if the event data is above a line threshold
         boolean foundLine = e.getLightValue() > LINE_THRESHOLD;
         // If the event data is different the last event,
-        if(foundLine) {
+        if(foundLine != onLine) {
             // Update the value of onLine
             onLine = foundLine;
             // Notify listeners with a new LineEvent
