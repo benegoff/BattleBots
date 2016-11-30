@@ -9,9 +9,13 @@ public class RobotDetector implements SightSensorListener, TouchListener{
 	private SightSensor sightSensor;
 	private TouchSensor touchSensor;
 	private List<ActionListener> actionListeners;
+	private boolean isPressed;
+	private boolean foundRobot;
 	
 	public RobotDetector(SightSensor sightSensor, TouchSensor touchSensor){
 		actionListeners = new ArrayList<ActionListener>();
+		isPressed = false;
+		foundRobot = false;
 		this.sightSensor = sightSensor;
 		this.sightSensor.registerListener(this);
 		this.touchSensor = touchSensor;
@@ -35,26 +39,32 @@ public class RobotDetector implements SightSensorListener, TouchListener{
 	 * @param e - The event that was raised.
 	 */
 	@Override
-	public void onTouch(TouchEvent e) {
-		Action sendingAction;
-		
-		if(e.isTouching()) {
-			sendingAction = Action.Flipping;
-		} else {
-			sendingAction = Action.Releasing;
-		}
-		
-		for(ActionListener al : actionListeners){
-			al.onActionEvent(new ActionEvent(sendingAction));
+	public void onTouch(TouchEvent e) {		
+		if(isPressed != e.isTouching()) {
+			Action sendingAction;
+			// Update isPressed
+			isPressed = e.isTouching();
+			sendingAction = isPressed ? Action.Flipping : Action.Releasing;
+
+			for(ActionListener al : actionListeners){
+				al.onActionEvent(new ActionEvent(sendingAction));
+			}
 		}
 	}
 
 	@Override
 	public void onSightEvent(SightSensorEvent e) {
-		if(e.getDistance() > MIN_DISTANCE && e.getDistance() < MAX_DISTANCE)
+		boolean inRange = e.getDistance() > MIN_DISTANCE && e.getDistance() < MAX_DISTANCE;
+		if(inRange != foundRobot) {
+			// Update the value of foundRobot
+			foundRobot = inRange;
+			// A change occurred, send the event
+			Action sendingAction = inRange ? Action.MovingForward : Action.MovingBackward;
+			// Send the event
 			for(ActionListener al : actionListeners){
-				al.onActionEvent(new ActionEvent(Action.MovingForward));
+				al.onActionEvent(new ActionEvent(sendingAction));
 			}
+		}
 	}
 	
 }

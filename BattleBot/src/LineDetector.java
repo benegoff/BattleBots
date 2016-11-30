@@ -14,10 +14,10 @@ public class LineDetector implements LightSensorListener {
      * will register for events
      */
     public LineDetector(LightSensor sensor) {
-        // Register with the light sensor
-        sensor.registerListener((EventListener)this);
         // Create the list of listeners
         listeners = new ArrayList<LineListener>();
+        // Register with the light sensor
+        sensor.registerListener((EventListener)this);
         // Set the initial value of onLine
         onLine = false;
     }

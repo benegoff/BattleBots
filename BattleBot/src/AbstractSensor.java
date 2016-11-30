@@ -45,6 +45,7 @@ public abstract class AbstractSensor implements Sensor, Runnable {
 	 * Reads from the sensor and sends events to the listeners if 
 	 * a change occurs.
 	 */
+	@Override
 	public void run() {
 		// While the sensor exists...
 		while(true) {
@@ -53,6 +54,10 @@ public abstract class AbstractSensor implements Sensor, Runnable {
 			//	Yield to other threads
 			Thread.yield();
 		}
+	}
+	
+	public boolean brokenThread() {
+		return sensorThread.isInterrupted();
 	}
 
 	/**

@@ -6,7 +6,8 @@
 public enum Action {
     MovingForward, MovingBackward, 
     RotateRight, RotateLeft, 
-    Backup, 
+    PivotRight, PivotLeft,
+    Backup, RingReturn,
     Flipping, Clearing, Releasing,
     Wiggle
 }

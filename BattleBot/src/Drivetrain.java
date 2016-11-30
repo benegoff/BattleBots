@@ -83,11 +83,26 @@ public class Drivetrain {
 		rightWheel.controlMotor(currentRotatePower, BasicMotorPort.BACKWARD);
 	}
 	
+	/**
+	 * Rotates only the left wheel to rotate the robot
+	 */
+	public void pivotLeft() {
+		// Set left wheel to rotate backward
+		leftWheel.controlMotor(currentRotatePower, BasicMotorPort.BACKWARD);
+	}
+	
 	public void rotateRight() {
 		// Set the left wheel to rotate backward
 		leftWheel.controlMotor(currentRotatePower, BasicMotorPort.BACKWARD);
 		// Set the right wheel to rotate forward
 		rightWheel.controlMotor(currentRotatePower, BasicMotorPort.FORWARD);
+	}
+	
+	/**
+	 * Rotates only the right wheel to rotate the robot
+	 */
+	public void pivotRight() {
+		rightWheel.controlMotor(currentRotatePower, BasicMotorPort.BACKWARD);
 	}
 	
 	/**

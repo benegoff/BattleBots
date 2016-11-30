@@ -10,15 +10,20 @@ public class Robot implements ActionListener, LineListener {
 	private Drivetrain drivetrain;
 	private RobotDetector detector;
 	private RobotArm arm;
+	
+	private LightSensor lightSensor;
+	private SightSensor sightSensor;
+	private TouchSensor touchSensor;
 
 	public Robot() {
-		lineDetector = new LineDetector(new LightSensor(new LejosLightWrapper(SensorPort.S2)));
-		drivetrain = new Drivetrain(MotorPort.A, MotorPort.B);
+		lightSensor = new LightSensor(new LejosLightWrapper(SensorPort.S2));
+		lineDetector = new LineDetector(lightSensor);
 		lineDetector.registerListener(this);
+		drivetrain = new Drivetrain(MotorPort.A, MotorPort.B);
 		arm = new RobotArm(Motor.C);
-		SightSensor s = new SightSensor(new UltrasonicWrapper(SensorPort.S1));
-		TouchSensor t = new TouchSensor(new TouchWrapper(SensorPort.S3));
-		detector = new RobotDetector(s, t);
+		sightSensor = new SightSensor(new UltrasonicWrapper(SensorPort.S1));
+		touchSensor = new TouchSensor(new TouchWrapper(SensorPort.S3));
+		detector = new RobotDetector(sightSensor, touchSensor);
 		detector.registerListener(this);
 	}
 	
@@ -42,11 +47,14 @@ public class Robot implements ActionListener, LineListener {
 		case Flipping:
 			changeStateFlipping();
 			break;
-		case Releasing: 
-			changeStateReleasing();
+//		case Releasing: 
+//			changeStateReleasing();
+//			break;
+		case MovingBackward:
+			changeStateMovingBackward();
 			break;
 		default:
-			changeStateWiggle();
+			changeStateRotateLeft();
 			break;
 		}
 	}
@@ -60,6 +68,7 @@ public class Robot implements ActionListener, LineListener {
 	 */
 	@Override
 	public void onLineEvent(LineEvent e) {
+		if(currentState != null) {
 		/* 
 		 * Cases to handle - Found line: 
 		 * 1) Moving forward -> Backup
@@ -71,28 +80,54 @@ public class Robot implements ActionListener, LineListener {
 		 * 1) Getting stuck between Rotate right and rotate left, 
 		 * 		Need to rotate for longer - Half rotate then rotate?
 		 */
-		if(e.isOnLine()) {
-			switch(currentState) {
-			case RotateLeft:
-				changeStateRotateRight();
-				break;
-			case RotateRight:
-				changeStateRotateLeft();
-				break;
-			case MovingForward:
-				changeStateBackup();
-				break;
-			case Clearing:
-				changeStateReleasing();
-				break;
-			default:
-				changeStateRotateLeft();
-				break;
+			if(e.isOnLine()) {
+				switch(currentState) {
+				case RotateLeft:
+					changeStateRotateRight();
+					break;
+				case RotateRight:
+					changeStateRotateLeft();
+					break;
+				case MovingForward:
+				case Wiggle:
+					changeStateBackup();
+					break;
+				case MovingBackward:
+					changeStateRingReturn();
+					break;
+				case Clearing:
+					changeStateReleasing();
+					break;
+				default:
+					changeStateRotateLeft();
+					break;
+				}
+			}
+			else {
+//				switch(currentState) {
+//				case RotateLeft:
+//				case RotateRight:
+//					changeStateRingReturn();
+//					break;
+//				default:
+//					break;
+//				}
 			}
 		}
 	}
 	
 	/* ===== STATE CHANGE METHODS ===== */
+	
+	private void changeStateRingReturn() {
+		if(currentState != Action.RingReturn) {
+			System.out.println("RingReturn");
+			currentState = Action.RingReturn;
+			drivetrain.moveForward();
+			Delay.msDelay(500);
+		}
+		// Return to the idle state
+		changeStateRotateLeft();
+	}
 	
 	private void changeStateBackup() {
 		if(currentState != Action.Backup) {
@@ -102,7 +137,7 @@ public class Robot implements ActionListener, LineListener {
 			Delay.msDelay(1500);
 		}
 		// Return to the idle state
-		changeStateWiggle();
+		changeStateRotateLeft();
 	}
 	
 	private void changeStateMovingForward() {
@@ -114,16 +149,46 @@ public class Robot implements ActionListener, LineListener {
 		}
 	}
 	
+	private void changeStateMovingBackward() {
+		if(currentState != Action.Clearing) {
+			System.out.println("Backward");
+			currentState = Action.MovingBackward;
+			drivetrain.moveBackward();
+		}
+	}
+	
 	private void changeStateRotateRight() {
-		System.out.println("RotateRight");
-		currentState = Action.RotateRight;
-		drivetrain.rotateRight();
+		if(currentState != Action.Clearing) {
+			System.out.println("RotateRight");
+			currentState = Action.RotateRight;
+			drivetrain.rotateRight();
+		}
+	}
+	
+	private void changeStatePivotRight() {
+		if(currentState == Action.RotateRight || currentState == Action.RotateLeft) {
+			System.out.println("PivotRight");
+			currentState = Action.PivotRight;
+			drivetrain.pivotRight();
+		}
 	}
 	
 	private void changeStateRotateLeft() {
-		System.out.println("RotateLeft");
-		currentState = Action.RotateLeft;
-		drivetrain.rotateLeft();
+		if(currentState != Action.Clearing) {
+			drivetrain.stopMovement();
+			System.out.println("RotateLeft");
+			currentState = Action.RotateLeft;
+			drivetrain.rotateLeft();
+		}
+	}
+	
+	private void changeStatePivotLeft() {
+		if(currentState == Action.RotateRight || currentState == Action.RotateLeft) {
+			drivetrain.stopMovement();
+			System.out.println("PivotLeft");
+			currentState = Action.PivotLeft;
+			drivetrain.pivotLeft();
+		}
 	}
 	
 	private void changeStateFlipping() {
@@ -146,12 +211,13 @@ public class Robot implements ActionListener, LineListener {
 	
 	private void changeStateReleasing() {
 		System.out.println("Releasing");
+		drivetrain.stopMovement();
 		currentState = Action.Releasing;
 		// Open the robot arm
 		arm.open();
 		// Set the power back to normal
 		drivetrain.setCurrentPower(Drivetrain.POWER);
-		// Change the state to backup
+		// backup 
 		changeStateBackup();
 	}
 	
@@ -169,31 +235,21 @@ public class Robot implements ActionListener, LineListener {
 	private void halfRotate() {
 		if(isWiggling()) {
 			drivetrain.rotateRight();
-			wiggleWaiter(.75f);
+			Delay.msDelay((long).75f * 1000);
 		}
 	}
 	
 	private void wiggleLeft() {
 		if(isWiggling()) {
 			drivetrain.rotateLeft();
-			wiggleWaiter(1.25f);
+			Delay.msDelay((long)1.25f * 1000);
 		}
 	}
 	
 	private void wiggleRight() {
-		drivetrain.rotateRight();
-		wiggleWaiter(1.25f);
-	}
-	
-	/**
-	 * A specialized wait that keeps a program in scope unless the state
-	 * of the machine changes.
-	 * @param seconds - The time to wait, in seconds
-	 */
-	private void wiggleWaiter(float seconds) {
-		long endTime = System.currentTimeMillis() + (long)(seconds * 1000);
-		while(System.currentTimeMillis() < endTime && isWiggling()) {
-			Thread.yield();
+		if(isWiggling()) {
+			drivetrain.rotateRight();
+			Delay.msDelay((long)1.5f * 1000);
 		}
 	}
 	
